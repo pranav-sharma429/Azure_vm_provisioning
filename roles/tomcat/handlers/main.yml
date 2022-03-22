@@ -1,0 +1,3 @@
+---
+- name: restart tomcat
+  command: /opt/apache-tomcat-7.0.61/tomcat restart

@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Pranav Sharma
+  company: 
+  description: Apache Tomcat
+  license: license (BSD)
+  min_ansible_version: 2.9
+  platforms:
+  - name: Redhat
+    versions:
+    - all
+  - name: CentOS
+    versions:
+    - all
+  galaxy_tags:
+    - tomcat
+  categories:
+    - Java
+    - Web
+
+dependencies: []

@@ -1,0 +1,65 @@
+---
+- name: Print a message
+  ansible.builtin.debug:
+    msg: 'This is an automated VM provisioning of {{ os }} OS, Now we are going to create required resource in sequence'
+- name: "Creating ResourceGroup for a VM"
+  azure_rm_resourcegroup:
+    name: devresgroup
+    location: eastus2
+    tags:
+        testing: testing
+
+- name: "Creating Virtual Network"
+  azure.azcollection.azure_rm_virtualnetwork:
+    resource_group: devresgroup
+    name: devvn001
+    address_prefixes: "10.10.0.0/16"
+
+- name: Creating Subnet
+  azure.azcollection.azure_rm_subnet:
+    resource_group: devresgroup
+    name: devsubnet001
+    address_prefix: "10.10.0.0/24"
+    virtual_network: devvn001
+
+- name: Creating security group that allows ports
+  azure.azcollection.azure_rm_securitygroup:
+    resource_group: devresgroup
+    name: devsecgroup001
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22,8443,9443
+        access: Allow
+        priority: 101
+        direction: Inbound
+
+- name: Creating virtual machine
+  azure.azcollection.azure_rm_virtualmachine:
+    resource_group: devresgroup
+    name: devvm001
+    vm_size: Standard_DS1
+    managed_disk_type: Standard_LRS
+    admin_username: azureuser
+    admin_password: AzureUser@123
+    ssh_public_keys:
+      - path: /home/azureuser/.ssh/authorized_keys
+        key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCBltFHTUpuN2l/CnhRdv5hE+5N+GDmhP+O/k90wVFnBmiS5qYLNCYeCgzLQFNZmwpaJfo15xZZAA58jknui8ehrO1hDabXegNcAI4rbD++zEE65NIAltA18vSE+SkVzcKk8pUN8/wDT2Xrn3qVRYvF4Garos9RmlHxgIhcofZNjs/LlSGlfbThBn/oCJwmXuXqL+sOUhpiVxFQzfZ9hAC1lGLN6H4EkDU+eZu5kuXMrK6CkxaPsN1cvX8mLwzc8tqOT2zTy0iBP/RPMUXfsJ3ThE74UjnmVT4WyyZKnqqJwWKt5UvS6IZRFpvcXySLEJ49RY9mVKralt3cJOlF6vh azureuser@developer.pslabs.com
+    image:
+      offer: CentOS
+      publisher: OpenLogic
+      sku: 7_9-gen2
+      version: latest
+
+- name: "Gathering required info..."
+  script: gather.sh 
+
+- name: " Virtual Machine {{ os }} is now provisioned , below are the details:"
+  azure_rm_virtualmachine_info:
+    resource_group: devresgroup
+    name: devvm001
+  register: info
+- debug:
+      var: info
+
+

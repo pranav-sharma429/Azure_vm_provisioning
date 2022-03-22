@@ -1,0 +1,60 @@
+---
+- name: Print a message
+  ansible.builtin.debug:
+    msg: 'This is an automated configuration deployment of Apache Tomcat Server provisioning on  {{ os }} OS , Now we are going to create required resource in sequence'
+#- name: "Opening required Ports on Virtual Machine"
+- pause:
+    prompt: "Proceeding will continue to Deploy Apache Tomcat Server on {{ ansible_hostname }}  {{ os }} VM"
+
+- name: Performing environment pre-checks
+  command: yum clean all
+- name: Performing environment post-checks...
+  command: yum list telnet
+  
+
+- name: Install Java 1.7
+  yum: name=java-1.8.0-openjdk state=present
+
+- name: add group "tomcat"
+  group: name=tomcat
+
+- name: add user "tomcat"
+  user: name=tomcat group=tomcat home=/usr/share/tomcat createhome=no
+  become: True
+  become_method: sudo
+
+- name: Download Tomcat
+  get_url: url=https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.77/bin/apache-tomcat-8.5.77-deployer.tar.gz dest=/opt/apache-tomcat-8.5.77-deployer.tar.gz
+
+- name: Extract archive
+  command: chdir=/usr/share /bin/tar xvf /opt/apache-tomcat-8.5.77-deployer.tar.gz -C /opt/ creates=/opt/apache-tomcat-8.5.77
+
+- name: Symlink install directory
+  file: src=/opt/apache-tomcat-8.5.77 path=/usr/share/tomcat state=link
+
+- name: Change ownership of Tomcat installation
+  file: path=/usr/share/tomcat/ owner=tomcat group=tomcat state=directory recurse=yes
+
+- name: Configure Tomcat server
+  template: src=server.xml dest=/usr/share/tomcat/conf/
+  notify: restart tomcat
+
+- name: Configure Tomcat users
+  template: src=tomcat-users.xml dest=/usr/share/tomcat/conf/
+  notify: restart tomcat
+
+- name: Install Tomcat init script
+  copy: src=tomcat-initscript.sh dest=/etc/init.d/tomcat mode=0755
+- name: Finalizing configuration  
+  copy: src=tomcat-initscript.sh dest=/opt/apache-tomcat-8.5.77/tomcat mode=0755
+
+- name: Start Tomcat
+  command: /opt/apache-tomcat-8.5.77/tomcat start
+
+- name: Deploying a war file to tomcat instance 
+  copy: src=highvaildemo.war dest=/opt/apache-tomcat-8.5.77/webapps/
+
+- name: wait for tomcat to start
+  wait_for: port={{http_port}}  
+  
+ 
