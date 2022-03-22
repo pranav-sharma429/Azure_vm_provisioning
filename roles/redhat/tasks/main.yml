@@ -2,6 +2,7 @@
 - name: Print a message
   ansible.builtin.debug:
     msg: 'This is an automated VM provisioning of {{ os }} OS, Now we are going to create required resource in sequence'
+
 - name: "Creating ResourceGroup for a VM"
   azure_rm_resourcegroup:
     name: devresgroup
@@ -22,6 +23,18 @@
     address_prefix: "10.10.0.0/24"
     virtual_network: devvn001
 
+
+
+#- name: Create virtual network interface card for a VM
+#  azure_rm_networkinterface:
+#    resource_group: devresgroup
+#    name: devvm001nic
+#    virtual_network: devvn001
+#    subnet: devsubnet001
+#    public_ip_name: myvm001ip
+#    security_group: devsecgroup001
+
+
 - name: Creating security group that allows ports
   azure.azcollection.azure_rm_securitygroup:
     resource_group: devresgroup
@@ -29,17 +42,59 @@
     rules:
       - name: SSH
         protocol: Tcp
-        destination_port_range: 22,8443,9443
+        destination_port_range: 22
         access: Allow
         priority: 101
         direction: Inbound
+      - name: allow-tomcat1
+        protocol: Tcp
+        destination_port_range: 8443
+        access: Allow
+        priority: 102
+        direction: Inbound
+      - name: allow-tomcat2
+        protocol: Tcp
+        destination_port_range: 9443
+        access: Allow
+        priority: 103
+        direction: Inbound
 
+- name: Create public ip
+  azure.azcollection.azure_rm_publicipaddress:
+    resource_group: devresgroup
+    allocation_method: Static
+    name: publicip001
+
+- name: Create NIC
+  azure.azcollection.azure_rm_networkinterface:
+    resource_group: devresgroup
+    name: devvmnic001
+    virtual_network: devvn001
+    subnet: devsubnet001
+    public_ip_name: publicip001
+    security_group: devsecgroup001
+
+#- name: Create a network interface with public and private IP assignments
+#  azure_rm_networkinterface:
+#    name: devvmnic001
+#    resource_group: devresgroup
+#    virtual_network: devvn001
+#    subnet_name: devsubnet001
+#    security_group: devsecgroup001
+#    ip_configurations:
+#      - name: ipconfig1
+#        public_ip_address_name: publicip001
+#        public_ip_allocation_method: Dynamic
+#        primary: True
+#        private_ip_allocation_method: Dynamic
+   
 - name: Creating virtual machine
   azure.azcollection.azure_rm_virtualmachine:
     resource_group: devresgroup
     name: devvm001
     vm_size: Standard_DS1
     managed_disk_type: Standard_LRS
+    network_interfaces: devvmnic001 
     admin_username: azureuser
     admin_password: AzureUser@123
     ssh_public_keys:
@@ -63,3 +118,17 @@
       var: info
 
 
+- name: OS provisioning with required OS and Network Interface is now complete, do you wish to proceed
+  pause:
+
+- name: Gathering required details....
+  command: az vm show -d -g devresgroup -n devvm001 --query publicIps -o tsv
+  register: devvm001
+- debug:
+    var: devvm001.stdout  
+
+- name: Add host to Ansible groups
+  add_host:
+    hostname: "{{ devvm001.stdout }}" 
+    groups: 
+    - tomcat1

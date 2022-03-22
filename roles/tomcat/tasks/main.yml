@@ -3,6 +3,7 @@
 ---
 
 - name: Installng Java JDK package
+  become: yes
   yum: name=java-1.7.0-openjdk state=present
 
 - name: Adding System group "tomcat"
@@ -13,6 +14,11 @@
   become: True
   become_method: sudo
 
+- name: Starting service firewalld
+  systemd:
+    name: firewalld
+    state: started
+
 - name: Adding Firewall rules
   firewalld:
     permanent: yes
@@ -22,7 +28,10 @@
   with_items:
     - "{{ http_port }}"
     - "{{ https_port }}"
-
+- name: reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
 
 
 - name: Downloading Apache Tomcat
@@ -58,3 +67,4 @@
 
 - name: wait for Application Server Tomcat to start
   wait_for: port={{http_port}}
+

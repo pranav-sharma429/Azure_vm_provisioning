@@ -1,3 +1,13 @@
 ---
 os: CentOS 7.9
 qty: 1
+http_port: 8443
+https_port: 9443
+admin_username: admin
+admin_password: adminsecret
+
+devvm001: 20.119.169.119
+devvm001: 20.122.98.124
+devvm001: 20.122.98.124
+devvm001: 20.122.98.124
+devvm001: 20.122.98.124
