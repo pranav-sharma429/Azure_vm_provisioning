@@ -1,8 +1,8 @@
-# Ansible IBM Cloud Infrastructure Auomtation - GTS
+# Azure Cloud Cloud Infrastructure Auomtation - by Pranav Sharma, Principal Solutions Architect - DevOps Consulting
 Ansible Playbook Module structure that configures VM Instances on MicroSoft Azure Cloud with below automation features 
 
 ## Architecture
-#![picture](docs/imgs/ic.png)
+// ![picture](docs/imgs/ic.png)
 
 ### Following are the current feature set
 1. Creating Resource group infrastructure on Azure Cloud
