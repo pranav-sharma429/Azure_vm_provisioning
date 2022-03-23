@@ -3,7 +3,7 @@
 Ansible Playbook Module structure that configures VM Instances on MicroSoft Azure Cloud with below automation features 
 
 ## Architecture
-
+### UseCase - Provisioning+Compliance+Automation+Orchrestration+Apps Deployment
  ![picture](docs/imgs/Azuretom.png)
 
 ### Following are the current feature set for a VM Provisioning
