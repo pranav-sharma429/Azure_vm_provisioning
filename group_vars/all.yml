@@ -5,7 +5,9 @@ http_port: 8443
 https_port: 9443
 admin_username: admin
 admin_password: adminsecret
-
-devvm001: 20.119.169.119
-devvm001: 20.62.119.214
-devvm001: 52.184.151.60
+location: eastus2
+adminusername: azureuser
+adminpassword: AzureUser@134
+keydata: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCBltFHTUpuN2l/CnhRdv5hE+5N+GDmhP+O/k90wVFnBmiS5qYLNCYeCgzLQFNZmwpaJfo15xZZAA58jknui8ehrO1hDabXegNcAI4rbD++zEE65NIAltA18vSE+SkVzcKk8pUN8/wDT2Xrn3qVRYvF4Garos9RmlHxgIhcofZNjs/LlSGlfbThBn/oCJwmXuXqL+sOUhpiVxFQzfZ9hAC1lGLN6H4EkDU+eZu5kuXMrK6CkxaPsN1cvX8mLwzc8tqOT2zTy0iBP/RPMUXfsJ3ThE74UjnmVT4WyyZKnqqJwWKt5UvS6IZRFpvcXySLEJ49RY9mVKralt3cJOlF6vh azureuser@developer.pslabs.com
+devvm001: 
+devvm001: 20.230.58.184
